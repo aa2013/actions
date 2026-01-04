@@ -191,7 +191,7 @@ jobs:
           name: Lua ${{ env.LUA_VERSION }} for Android
           tag_name: Lua-v${{ env.LUA_VERSION }}-for-Android
           files: |
-            artifacts/**/*.so
+            artifacts/**/liblua-*-android-*.so
           generate_release_notes: false
           draft: false
           prerelease: false

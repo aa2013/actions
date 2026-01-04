@@ -1,4 +1,6 @@
 name: Build and Release Android Lua Libraries
+permissions:
+  contents: write
 
 on:
   workflow_dispatch:  # 允许手动触发

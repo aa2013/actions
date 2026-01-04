@@ -192,7 +192,6 @@ jobs:
           tag_name: Lua-v${{ env.LUA_VERSION }}-for-Android
           files: |
             artifacts/**/liblua-*-android-*.so
-          overwrite: true  # 允许覆盖已存在的 Release
           generate_release_notes: false
           draft: false
           prerelease: false

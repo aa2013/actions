@@ -1,4 +1,5 @@
 name: Build and Release Android Lua Libraries
+# 仓库写入权限
 permissions:
   contents: write
 
@@ -188,7 +189,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: Lua ${{ env.LUA_VERSION }} for Android
-          tag_name: Lua ${{ env.LUA_VERSION }} for Android
+          tag_name: Lua-v${{ env.LUA_VERSION }}-for-Android
           files: |
             artifacts/**/*.so
           generate_release_notes: false

@@ -1,0 +1,121 @@
+name: Build Android Lua for Multiple Architectures
+
+on:
+  workflow_dispatch:  # 允许手动触发
+
+env:
+  LUA_VERSION: 5.4.8
+  ANDROID_NDK_VERSION: r26b
+  ANDROID_API_LEVEL: 21
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        architecture: [armeabi-v7a, arm64-v8a, x86, x86_64]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget unzip make gcc
+    
+    - name: Download and extract Android NDK
+      run: |
+        wget https://dl.google.com/android/repository/android-ndk-${{ env.ANDROID_NDK_VERSION }}-linux.zip
+        unzip -q android-ndk-${{ env.ANDROID_NDK_VERSION }}-linux.zip
+        export ANDROID_NDK_HOME=$PWD/android-ndk-${{ env.ANDROID_NDK_VERSION }}
+        echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
+    
+    - name: Download Lua source code
+      run: |
+        wget https://www.lua.org/ftp/lua-${{ env.LUA_VERSION }}.tar.gz
+        tar -xzf lua-${{ env.LUA_VERSION }}.tar.gz
+        cd lua-${{ env.LUA_VERSION }}
+    
+    - name: Setup toolchain
+      id: set_toolchain
+      run: |
+        case "${{ matrix.architecture }}" in
+          "armeabi-v7a")
+            export TOOLCHAIN=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi${{ env.ANDROID_API_LEVEL }}-clang
+            export ARCH=arm
+            ;;
+          "arm64-v8a")
+            export TOOLCHAIN=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android${{ env.ANDROID_API_LEVEL }}-clang
+            export ARCH=aarch64
+            ;;
+          "x86")
+            export TOOLCHAIN=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android${{ env.ANDROID_API_LEVEL }}-clang
+            export ARCH=i686
+            ;;
+          "x86_64")
+            export TOOLCHAIN=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android${{ env.ANDROID_API_LEVEL }}-clang
+            export ARCH=x86_64
+            ;;
+        esac
+        echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
+        echo "ARCH=$ARCH" >> $GITHUB_ENV
+    
+    - name: Build Lua for Android
+      run: |
+        cd lua-${{ env.LUA_VERSION }}
+        make clean
+        
+        # Create custom Makefile for Android
+        cat > src/Makefile.android << 'EOF'
+        CC=${{ env.TOOLCHAIN }}
+        AR=${{ env.TOOLCHAIN }}ar
+        RANLIB=${{ env.TOOLCHAIN }}ranlib
+        MYCFLAGS=-fPIC -O2 -I$(LUA_INC) -DLUA_USE_DLOPEN
+        MYLDFLAGS=-shared
+        PLAT= generic
+        
+        CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o \
+                lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o ltm.o lundump.o \
+                lvm.o lzio.o
+        LIB_O=	lauxlib.o lbaselib.o lcorolib.o ldblib.o liolib.o lmathlib.o loslib.o lstrlib.o \
+                ltablib.o linit.o
+        
+        LUA_T=	liblua.so
+        LUA_O=	lua.o
+        
+        LUAC_T=	luac
+        LUAC_O=	luac.o
+        
+        ALL_O= $(CORE_O) $(LIB_O) $(LUA_O) $(LUAC_O)
+        ALL_T= $(LUA_T) $(LUAC_T)
+        
+        all:	$(ALL_T)
+        
+        o:	$(ALL_O)
+        
+        $(LUA_T): $(CORE_O) $(LIB_O)
+        	$(CC) -o $@ $(MYLDFLAGS) $(CORE_O) $(LIB_O) $(MYLIBS)
+        
+        $(LUAC_T): $(LUAC_O) $(LIB_O)
+        	$(CC) -o $@ $(MYLDFLAGS) $(LUAC_O) $(LIB_O) $(CORE_O) $(MYLIBS)
+        
+        clean:
+        	$(RM) $(ALL_T) $(ALL_O)
+        
+        .c.o:
+        	$(CC) $(MYCFLAGS) -c $<
+        EOF
+        
+        # Build Lua
+        make -C src -f Makefile.android
+        
+        # Create output directory
+        mkdir -p ../output/android/${{ matrix.architecture }}
+        cp src/liblua.so ../output/android/${{ matrix.architecture }}/
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: lua-android-${{ matrix.architecture }}
+        path: output/android/${{ matrix.architecture }}/liblua.so

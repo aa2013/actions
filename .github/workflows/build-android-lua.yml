@@ -64,13 +64,14 @@ jobs:
         rm lua-${{ env.LUA_VERSION }}.tar.gz
         
     - name: Cache lua-cjson source
+      id: cache-lua-cjson
       uses: actions/cache@v4
       with:
         path: lua-cjson
         key: lua-cjson-${{ env.LUA_CJSON_VERSION }}
 
     - name: Download lua-cjson (if not cached)
-      if: steps.cache-lua.outputs.cache-hit != 'true'
+      if: steps.cache-lua-cjson.outputs.cache-hit != 'true'
       run: |
         git clone --depth 1 --branch ${{ env.LUA_CJSON_VERSION }} \
           https://github.com/openresty/lua-cjson.git

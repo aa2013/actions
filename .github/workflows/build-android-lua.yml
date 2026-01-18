@@ -11,6 +11,7 @@ on:
 
 env:
   LUA_VERSION: 5.4.8
+  LUA_CJSON_VERSION: 2.1.0.15
   ANDROID_NDK_VERSION: r26b
   ANDROID_API_LEVEL: 21
   CACHE_VERSION: v1  # 缓存版本，当NDK或工具链更新时修改此值
@@ -61,7 +62,19 @@ jobs:
         wget -q https://www.lua.org/ftp/lua-${{ env.LUA_VERSION }}.tar.gz
         tar -xzf lua-${{ env.LUA_VERSION }}.tar.gz
         rm lua-${{ env.LUA_VERSION }}.tar.gz
-    
+        
+    - name: Cache lua-cjson source
+      uses: actions/cache@v4
+      with:
+        path: lua-cjson
+        key: lua-cjson-${{ env.LUA_CJSON_VERSION }}
+
+    - name: Download lua-cjson (if not cached)
+      if: steps.cache-lua.outputs.cache-hit != 'true'
+      run: |
+        git clone --depth 1 --branch ${{ env.LUA_CJSON_VERSION }} \
+          https://github.com/openresty/lua-cjson.git
+
     - name: Setup toolchain
       id: set_toolchain
       run: |
@@ -151,7 +164,33 @@ jobs:
         cp src/liblua.so ../output/android/${{ matrix.architecture }}/liblua.so
         
         echo "Built: $OUTPUT_NAME"
+        
+    - name: Build lua-cjson for Android
+      run: |
+        LUA_SRC=$PWD/lua-${{ env.LUA_VERSION }}
+        CJSON_SRC=$PWD/lua-cjson
     
+        cd $CJSON_SRC
+    
+        make clean || true
+    
+        # 编译 cjson
+        ${{ env.TOOLCHAIN }} \
+          -fPIC -O2 -shared \
+          -I$LUA_SRC/src \
+          -o cjson.so \
+          lua_cjson.c strbuf.c fpconv.c \
+          -lm
+    
+        # Strip
+        ${{ env.STRIP }} --strip-unneeded cjson.so
+    
+        # 输出
+        mkdir -p ../output/android/${{ matrix.architecture }}
+        cp cjson.so ../output/android/${{ matrix.architecture }}/cjson.so
+    
+        echo "Built cjson.so for ${{ matrix.architecture }}"
+
     - name: Set output variables
       id: set_outputs
       run: |
@@ -192,6 +231,7 @@ jobs:
           tag_name: Lua-v${{ env.LUA_VERSION }}-for-Android
           files: |
             artifacts/**/liblua-*-android-*.so
+            artifacts/**/cjson.so
           generate_release_notes: false
           draft: false
           prerelease: false

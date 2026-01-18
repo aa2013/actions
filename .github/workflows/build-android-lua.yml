@@ -187,7 +187,7 @@ jobs:
         ${{ env.STRIP }} --strip-unneeded cjson.so
     
         # 输出
-        OUTPUT_NAME=cjson-${{ env.LUA_VERSION }}-android-${{ matrix.architecture }}.so
+        OUTPUT_NAME=cjson-${{ env.LUA_CJSON_VERSION }}-android-${{ matrix.architecture }}.so
         mkdir -p ../output/android/${{ matrix.architecture }}
         cp cjson.so ../output/android/${{ matrix.architecture }}/$OUTPUT_NAME
     
@@ -233,7 +233,7 @@ jobs:
           tag_name: Lua-v${{ env.LUA_VERSION }}-for-Android
           files: |
             artifacts/**/liblua-*-android-*.so
-            artifacts/**/cjson.so
+            artifacts/**/cjson-*-android-*.so
           generate_release_notes: false
           draft: false
           prerelease: false

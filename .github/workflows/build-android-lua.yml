@@ -187,8 +187,9 @@ jobs:
         ${{ env.STRIP }} --strip-unneeded cjson.so
     
         # 输出
+        OUTPUT_NAME=cjson-${{ env.LUA_VERSION }}-android-${{ matrix.architecture }}.so
         mkdir -p ../output/android/${{ matrix.architecture }}
-        cp cjson.so ../output/android/${{ matrix.architecture }}/cjson.so
+        cp cjson.so ../output/android/${{ matrix.architecture }}/$OUTPUT_NAME
     
         echo "Built cjson.so for ${{ matrix.architecture }}"
 

@@ -116,7 +116,7 @@ jobs:
         AR=${{ env.TOOLCHAIN }}ar
         RANLIB=${{ env.TOOLCHAIN }}ranlib
         STRIP=${{ env.STRIP }}
-        MYCFLAGS=-fPIC -O2 -I$(LUA_INC) -DLUA_USE_DLOPEN -DLUA_USE_LINUX -DLUA_USE_LARGEFILE
+        MYCFLAGS=-fPIC -O2 -I$(LUA_INC) -DLUA_USE_DLOPEN
         MYLDFLAGS=-shared
         MYLIBS=-ldl -lm
         PLAT= generic
@@ -181,6 +181,7 @@ jobs:
         ${{ env.TOOLCHAIN }} \
           -fPIC -O2 -shared \
           -I$LUA_SRC/src \
+          -DLUA_USE_DLOPEN
           -o cjson.so \
           lua_cjson.c strbuf.c fpconv.c \
           -lm

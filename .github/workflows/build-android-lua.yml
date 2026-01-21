@@ -120,6 +120,8 @@ jobs:
         MYLDFLAGS=-shared -Wl,-z,global
         MYLIBS=-ldl -lm
         PLAT= generic
+        CJSON_DIR=../../lua-cjson    # 相对于 lua/src 的路径
+        CJSON_O= $(CJSON_DIR)/lua_cjson.o $(CJSON_DIR)/strbuf.o $(CJSON_DIR)/fpconv.o
         
         CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
               	lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o \
@@ -134,14 +136,14 @@ jobs:
         LUAC_O=	luac.o
         
         ALL_T= $(CORE_T) $(LUA_T)
-        ALL_O= $(CORE_O) $(LUA_O) $(LIB_O)
+        ALL_O= $(CORE_O) $(LUA_O) $(LIB_O) $(CJSON_O)
         ALL_A= $(CORE_T)
         
         all:	$(ALL_T)
         
         o:	$(ALL_O)
         
-        $(LUA_T): $(CORE_O) $(LIB_O)
+        $(LUA_T): $(CORE_O) $(LIB_O) $(CJSON_O)
         	$(CC) -o $@ $(MYLDFLAGS) $(CORE_O) $(LIB_O) $(MYLIBS)
         	$(STRIP) --strip-unneeded $@
         
@@ -184,10 +186,10 @@ jobs:
           -DLUA_USE_DLOPEN \
           -o cjson.so \
           lua_cjson.c strbuf.c fpconv.c \
-          -L$LUA_SRC/src -llua -ldl -lm
+          -lm
     
         # Strip
-        # ${{ env.STRIP }} --strip-unneeded cjson.so
+        ${{ env.STRIP }} --strip-unneeded cjson.so
     
         # 输出
         OUTPUT_NAME=cjson-${{ env.LUA_CJSON_VERSION }}-android-${{ matrix.architecture }}.so

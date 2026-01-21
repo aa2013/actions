@@ -120,8 +120,7 @@ jobs:
         MYLDFLAGS=-shared
         MYLIBS=-ldl -lm
         PLAT= generic
-
-        CORE_T=	liblua.a
+        
         CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
               	lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o \
               	ltm.o lundump.o lvm.o lzio.o
@@ -142,11 +141,6 @@ jobs:
         all:	$(ALL_T)
         
         o:	$(ALL_O)
-        a:	$(ALL_A)
-        
-        $(CORE_T): $(CORE_O) $(AUX_O) $(LIB_O)
-        	$(AR) $@ $?
-        	$(RANLIB) $@
         
         $(LUA_T): $(CORE_O) $(AUX_O) $(LIB_O)
         	$(CC) -o $@ $(MYLDFLAGS) $(CORE_O) $(LIB_O) $(MYLIBS)

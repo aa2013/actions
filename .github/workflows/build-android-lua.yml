@@ -150,6 +150,9 @@ jobs:
         $(LUAC_T): $(LUAC_O) $(LIB_O)
         	$(CC) -o $@ $(MYLDFLAGS) $(LUAC_O) $(LIB_O) $(CORE_O) $(MYLIBS)
         
+        $(CJSON_DIR)/%.o: $(CJSON_DIR)/%.c
+        	$(CC) $(MYCFLAGS) -c $< -o $@
+          
         clean:
         	$(RM) $(ALL_T) $(ALL_O)
         

@@ -124,8 +124,7 @@ jobs:
         CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
               	lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o \
               	ltm.o lundump.o lvm.o lzio.o
-        AUX_O=	lauxlib.o
-        LIB_O=	lbaselib.o ldblib.o liolib.o lmathlib.o loslib.o ltablib.o lstrlib.o \
+        LIB_O=	lauxlib.o lbaselib.o ldblib.o liolib.o lmathlib.o loslib.o ltablib.o lstrlib.o \
         	      lutf8lib.o loadlib.o lcorolib.o linit.o
         
         LUA_T=	liblua.so
@@ -142,7 +141,7 @@ jobs:
         
         o:	$(ALL_O)
         
-        $(LUA_T): $(CORE_O) $(AUX_O) $(LIB_O)
+        $(LUA_T): $(CORE_O) $(LIB_O)
         	$(CC) -o $@ $(MYLDFLAGS) $(CORE_O) $(LIB_O) $(MYLIBS)
         	$(STRIP) --strip-unneeded $@
         

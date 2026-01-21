@@ -181,7 +181,7 @@ jobs:
         ${{ env.TOOLCHAIN }} \
           -fPIC -O2 -shared \
           -I$LUA_SRC/src \
-          -DLUA_USE_DLOPEN
+          -DLUA_USE_DLOPEN \
           -o cjson.so \
           lua_cjson.c strbuf.c fpconv.c \
           -lm

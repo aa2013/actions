@@ -116,7 +116,7 @@ jobs:
         AR=${{ env.TOOLCHAIN }}ar
         RANLIB=${{ env.TOOLCHAIN }}ranlib
         STRIP=${{ env.STRIP }}
-        MYCFLAGS=-fPIC -O2 -I$(LUA_INC) -DLUA_USE_DLOPEN
+        MYCFLAGS=-fPIC -O2 -I$(LUA_INC) -DLUA_USE_DLOPEN -DLUA_USE_POSIX -DLUA_USE_LINUX
         MYLDFLAGS=-shared
         MYLIBS=-ldl -lm
         PLAT= generic

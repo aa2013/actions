@@ -183,8 +183,8 @@ jobs:
           -I$LUA_SRC/src \
           -DLUA_USE_DLOPEN \
           -o cjson.so \
-          lua_cjson.c strbuf.c fpconv.c \
-          -lm
+          lua_cjson.c strbuf.c fpconv.c \\
+          -L$LUA_SRC/src -llua -ldl -lm
     
         # Strip
         ${{ env.STRIP }} --strip-unneeded cjson.so

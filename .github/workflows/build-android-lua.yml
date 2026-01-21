@@ -118,6 +118,7 @@ jobs:
         STRIP=${{ env.STRIP }}
         MYCFLAGS=-fPIC -O2 -I$(LUA_INC) -DLUA_USE_DLOPEN
         MYLDFLAGS=-shared
+        MYLIBS=-ldl -lm
         PLAT= generic
 
         CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o \

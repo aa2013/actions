@@ -109,7 +109,7 @@ jobs:
       run: |
         CJSON_DIR=$PWD/lua-cjson
         LUA_SRC=$PWD/lua-${{ env.LUA_VERSION }}/src
-        cp -r -n $CJSON_DIR/* $LUA_SRC/
+        cp -r $CJSON_DIR/* $LUA_SRC/
         
         cd lua-${{ env.LUA_VERSION }}
         #make clean

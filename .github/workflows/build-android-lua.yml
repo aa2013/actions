@@ -125,12 +125,6 @@ jobs:
         MYLIBS=-ldl -lm
         PLAT= generic
         
-        
-        # 编译规则，目标在当前目录
-        %.o: $(CJSON_DIR)/%.c
-        	$(CC) $(MYCFLAGS) -c $< -o $@
-
-        
         CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
               	lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o \
               	ltm.o lundump.o lvm.o lzio.o

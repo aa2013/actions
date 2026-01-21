@@ -183,11 +183,11 @@ jobs:
           -I$LUA_SRC/src \
           -DLUA_USE_DLOPEN \
           -o cjson.so \
-          lua_cjson.c strbuf.c fpconv.c \\
+          lua_cjson.c strbuf.c fpconv.c \
           -L$LUA_SRC/src -llua -ldl -lm
     
         # Strip
-        ${{ env.STRIP }} --strip-unneeded cjson.so
+        # ${{ env.STRIP }} --strip-unneeded cjson.so
     
         # 输出
         OUTPUT_NAME=cjson-${{ env.LUA_CJSON_VERSION }}-android-${{ matrix.architecture }}.so

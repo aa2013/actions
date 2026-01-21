@@ -112,7 +112,7 @@ jobs:
         cp -r -n $CJSON_DIR/* $LUA_SRC/
         
         cd lua-${{ env.LUA_VERSION }}
-        make clean
+        #make clean
         
         # Create custom Makefile for Android
         cat > src/Makefile.android << 'EOF'
